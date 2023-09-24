@@ -64,15 +64,13 @@ fn parse_number(it: &mut Peekable<Chars>, first_digit: char) -> Result<Token, Er
     let mut result = first_digit.to_digit(10).unwrap();
     while it.peek().map(|d| d.is_digit(10)).unwrap_or(false) {
         let next_digit = it.next().unwrap().to_digit(10).unwrap();
-        result = match result
-            .checked_mul(10)
-            .and_then(|times_ten| times_ten.checked_add(next_digit))
-        {
-            Some(r) => r,
-            None => return Err(NumberTooLarge),
-        }
+        result = add_digit(result, next_digit).ok_or(NumberTooLarge)?;
     }
     Ok(Num(result))
+}
+
+fn add_digit(num: u32, next_digit: u32) -> Option<u32> {
+    num.checked_mul(10)?.checked_add(next_digit)
 }
 
 #[cfg(test)]

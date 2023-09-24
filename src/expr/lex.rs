@@ -63,12 +63,11 @@ fn lex_chars(mut it: Peekable<Chars>) -> Result<Vec<Token>, Error> {
 fn parse_number(it: &mut Peekable<Chars>, first_digit: char) -> Result<Token, Error> {
     let mut result = first_digit.to_digit(10).unwrap();
     while it.peek().map(|d| d.is_digit(10)).unwrap_or(false) {
-        let intermediate = match result.checked_mul(10) {
-            Some(r) => r,
-            None => return Err(NumberTooLarge),
-        };
         let next_digit = it.next().unwrap().to_digit(10).unwrap();
-        result = match intermediate.checked_add(next_digit) {
+        result = match result
+            .checked_mul(10)
+            .and_then(|times_ten| times_ten.checked_add(next_digit))
+        {
             Some(r) => r,
             None => return Err(NumberTooLarge),
         }

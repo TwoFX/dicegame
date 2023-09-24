@@ -1,7 +1,7 @@
 use super::Operator;
 use super::ParseError;
 
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub enum Token {
     Num(u32),
     OpenParen,

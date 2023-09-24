@@ -1,5 +1,5 @@
 /// The basic (binary) operators which are allowed in the dice game.
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub enum Operator {
     Add,
     Sub,
@@ -11,6 +11,8 @@ pub enum Operator {
 pub enum ParseError {
     UnknownToken(char),
     NumberTooLarge,
+    UnexpectedToken(lex::Token),
+    UnexpectedEnd,
 }
 
 mod lex;

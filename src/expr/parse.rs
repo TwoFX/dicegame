@@ -1,3 +1,5 @@
+use core::slice::Iter;
+
 use super::lex::Token;
 use super::Operator;
 use super::ParseError;
@@ -12,8 +14,43 @@ pub enum SyntaxTree {
     },
 }
 
-pub fn parse(_tokens: &[Token]) -> Result<SyntaxTree, ParseError> {
-    Ok(SyntaxTree::Num(5))
+pub fn parse(tokens: &[Token]) -> Result<SyntaxTree, ParseError> {
+    parse_it(&mut tokens.iter())
+}
+
+fn parse_it(it: &mut Iter<Token>) -> Result<SyntaxTree, ParseError> {
+    let mut result = parse_one(it)?;
+    let mut op = parse_operator(it)?;
+    while op.is_some() {
+        let rhs = parse_one(it)?;
+        result = SyntaxTree::Op {
+            op: op.unwrap(),
+            left: Box::new(result),
+            right: Box::new(rhs),
+        };
+
+        op = parse_operator(it)?;
+    }
+
+    Ok(result)
+}
+
+fn parse_one(it: &mut Iter<Token>) -> Result<SyntaxTree, ParseError> {
+    let t = it.next().ok_or(ParseError::UnexpectedEnd)?;
+    match t {
+        Token::OpenParen => parse_it(it),
+        Token::Num(x) => Ok(SyntaxTree::Num(*x)),
+        x => Err(ParseError::UnexpectedToken(*x)),
+    }
+}
+
+fn parse_operator(it: &mut Iter<Token>) -> Result<Option<Operator>, ParseError> {
+    match it.next() {
+        None => Ok(None),
+        Some(Token::Op(op)) => Ok(Some(*op)),
+        Some(Token::CloseParen) => Ok(None),
+        Some(x) => Err(ParseError::UnexpectedToken(*x)),
+    }
 }
 
 #[cfg(test)]

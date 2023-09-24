@@ -67,12 +67,21 @@ mod tests {
             Token::CloseParen,
         ];
         assert_eq!(
-            SyntaxTree::Op {
+            Ok(SyntaxTree::Op {
                 op: Operator::Add,
                 left: Box::new(SyntaxTree::Num(5)),
                 right: Box::new(SyntaxTree::Num(2))
-            },
-            parse(&input[..]).unwrap()
+            }),
+            parse(&input[..])
+        );
+    }
+
+    #[test]
+    fn incorrect_close_paren() {
+        let input = vec![Token::Num(3), Token::CloseParen];
+        assert_eq!(
+            Err(ParseError::UnexpectedToken(Token::CloseParen)),
+            parse(&input[..])
         );
     }
 }

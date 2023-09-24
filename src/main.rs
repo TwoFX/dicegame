@@ -1,4 +1,4 @@
-use dicegame::expr::lex;
+use dicegame::expr;
 use std::io;
 
 fn main() {
@@ -8,6 +8,6 @@ fn main() {
         .read_line(&mut input)
         .expect("Failed to read line");
 
-    let lexed = lex::lex(input.as_str());
-    println!("{lexed:?}");
+    let parsed = expr::parse(input.as_str());
+    println!("{parsed:?}");
 }

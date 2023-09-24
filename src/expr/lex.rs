@@ -1,10 +1,5 @@
-#[derive(PartialEq, Eq, Debug)]
-pub enum Operator {
-    Add,
-    Sub,
-    Mul,
-    Div,
-}
+use super::Operator;
+use super::ParseError;
 
 #[derive(PartialEq, Eq, Debug)]
 pub enum Token {
@@ -14,23 +9,17 @@ pub enum Token {
     Op(Operator),
 }
 
-#[derive(PartialEq, Eq, Debug)]
-pub enum Error {
-    UnknownToken(char),
-    NumberTooLarge,
-}
-
 use std::{iter::Peekable, str::Chars};
 
-use Error::*;
 use Operator::*;
+use ParseError::*;
 use Token::*;
 
-pub fn lex(input: &str) -> Result<Vec<Token>, Error> {
+pub fn lex(input: &str) -> Result<Vec<Token>, ParseError> {
     lex_chars(input.chars().peekable())
 }
 
-fn lex_chars(mut it: Peekable<Chars>) -> Result<Vec<Token>, Error> {
+fn lex_chars(mut it: Peekable<Chars>) -> Result<Vec<Token>, ParseError> {
     let mut result = Vec::new();
     let mut current = it.next();
     while current.is_some() {
@@ -60,7 +49,7 @@ fn lex_chars(mut it: Peekable<Chars>) -> Result<Vec<Token>, Error> {
     Ok(result)
 }
 
-fn parse_number(it: &mut Peekable<Chars>, first_digit: char) -> Result<Token, Error> {
+fn parse_number(it: &mut Peekable<Chars>, first_digit: char) -> Result<Token, ParseError> {
     let mut result = first_digit.to_digit(10).unwrap();
     while it.peek().map(|d| d.is_digit(10)).unwrap_or(false) {
         let next_digit = it.next().unwrap().to_digit(10).unwrap();

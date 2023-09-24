@@ -77,10 +77,19 @@ mod tests {
     }
 
     #[test]
-    fn incorrect_close_paren() {
+    fn unmatched_close_paren() {
         let input = vec![Token::Num(3), Token::CloseParen];
         assert_eq!(
             Err(ParseError::UnexpectedToken(Token::CloseParen)),
+            parse(&input[..])
+        );
+    }
+
+    #[test]
+    fn unmatched_open_paren() {
+        let input = vec![Token::OpenParen, Token::Num(3)];
+        assert_eq!(
+            Err(ParseError::UnexpectedToken(Token::OpenParen)),
             parse(&input[..])
         );
     }

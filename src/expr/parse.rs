@@ -15,12 +15,12 @@ pub enum SyntaxTree {
 }
 
 pub fn parse(tokens: &[Token]) -> Result<SyntaxTree, ParseError> {
-    parse_it(&mut tokens.iter())
+    parse_it(&mut tokens.iter(), false)
 }
 
-fn parse_it(it: &mut Iter<Token>) -> Result<SyntaxTree, ParseError> {
+fn parse_it(it: &mut Iter<Token>, expect_close_paren: bool) -> Result<SyntaxTree, ParseError> {
     let mut result = parse_one(it)?;
-    let mut op = parse_operator(it)?;
+    let mut op = parse_operator(it, expect_close_paren)?;
     while op.is_some() {
         let rhs = parse_one(it)?;
         result = SyntaxTree::Op {
@@ -29,7 +29,7 @@ fn parse_it(it: &mut Iter<Token>) -> Result<SyntaxTree, ParseError> {
             right: Box::new(rhs),
         };
 
-        op = parse_operator(it)?;
+        op = parse_operator(it, expect_close_paren)?;
     }
 
     Ok(result)
@@ -38,17 +38,21 @@ fn parse_it(it: &mut Iter<Token>) -> Result<SyntaxTree, ParseError> {
 fn parse_one(it: &mut Iter<Token>) -> Result<SyntaxTree, ParseError> {
     let t = it.next().ok_or(ParseError::UnexpectedEnd)?;
     match t {
-        Token::OpenParen => parse_it(it),
+        Token::OpenParen => parse_it(it, true),
         Token::Num(x) => Ok(SyntaxTree::Num(*x)),
         x => Err(ParseError::UnexpectedToken(*x)),
     }
 }
 
-fn parse_operator(it: &mut Iter<Token>) -> Result<Option<Operator>, ParseError> {
+fn parse_operator(
+    it: &mut Iter<Token>,
+    expect_close_paren: bool,
+) -> Result<Option<Operator>, ParseError> {
     match it.next() {
-        None => Ok(None),
+        None if !expect_close_paren => Ok(None),
+        None => Err(ParseError::UnexpectedEnd),
         Some(Token::Op(op)) => Ok(Some(*op)),
-        Some(Token::CloseParen) => Ok(None),
+        Some(Token::CloseParen) if expect_close_paren => Ok(None),
         Some(x) => Err(ParseError::UnexpectedToken(*x)),
     }
 }
@@ -88,9 +92,6 @@ mod tests {
     #[test]
     fn unmatched_open_paren() {
         let input = vec![Token::OpenParen, Token::Num(3)];
-        assert_eq!(
-            Err(ParseError::UnexpectedToken(Token::OpenParen)),
-            parse(&input[..])
-        );
+        assert_eq!(Err(ParseError::UnexpectedEnd), parse(&input[..]));
     }
 }

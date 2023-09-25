@@ -20,16 +20,16 @@ pub fn parse(tokens: &[Token]) -> Result<SyntaxTree, ParseError> {
 
 fn parse_it(it: &mut Iter<Token>, expect_close_paren: bool) -> Result<SyntaxTree, ParseError> {
     let mut result = parse_one(it)?;
-    let mut op = parse_operator(it, expect_close_paren)?;
-    while op.is_some() {
+    let mut maybe_op = parse_operator(it, expect_close_paren)?;
+    while let Some(op) = maybe_op {
         let rhs = parse_one(it)?;
         result = SyntaxTree::Op {
-            op: op.unwrap(),
+            op,
             left: Box::new(result),
             right: Box::new(rhs),
         };
 
-        op = parse_operator(it, expect_close_paren)?;
+        maybe_op = parse_operator(it, expect_close_paren)?;
     }
 
     Ok(result)

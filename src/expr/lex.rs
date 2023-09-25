@@ -22,8 +22,7 @@ pub fn lex(input: &str) -> Result<Vec<Token>, ParseError> {
 fn lex_chars(mut it: Peekable<Chars>) -> Result<Vec<Token>, ParseError> {
     let mut result = Vec::new();
     let mut current = it.next();
-    while current.is_some() {
-        let c = current.unwrap();
+    while let Some(c) = current {
         if c == '(' {
             result.push(OpenParen);
         } else if c == ')' {

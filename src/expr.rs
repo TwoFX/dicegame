@@ -8,6 +8,16 @@ pub enum Operator {
 }
 
 #[derive(PartialEq, Eq, Debug)]
+pub enum Expr {
+    Num(u32),
+    Op {
+        op: Operator,
+        left: Box<Expr>,
+        right: Box<Expr>,
+    },
+}
+
+#[derive(PartialEq, Eq, Debug)]
 pub enum ParseError {
     UnknownToken(char),
     NumberTooLarge,
@@ -18,8 +28,6 @@ pub enum ParseError {
 mod lex;
 mod parse;
 
-pub use parse::SyntaxTree;
-
-pub fn parse(s: &str) -> Result<SyntaxTree, ParseError> {
+pub fn parse(s: &str) -> Result<Expr, ParseError> {
     parse::parse(&lex::lex(s)?[..])
 }

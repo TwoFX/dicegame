@@ -1,29 +1,20 @@
 use core::slice::Iter;
 
 use super::lex::Token;
+use super::Expr;
 use super::Operator;
 use super::ParseError;
 
-#[derive(PartialEq, Eq, Debug)]
-pub enum SyntaxTree {
-    Num(u32),
-    Op {
-        op: Operator,
-        left: Box<SyntaxTree>,
-        right: Box<SyntaxTree>,
-    },
-}
-
-pub fn parse(tokens: &[Token]) -> Result<SyntaxTree, ParseError> {
+pub fn parse(tokens: &[Token]) -> Result<Expr, ParseError> {
     parse_it(&mut tokens.iter(), false)
 }
 
-fn parse_it(it: &mut Iter<Token>, expect_close_paren: bool) -> Result<SyntaxTree, ParseError> {
+fn parse_it(it: &mut Iter<Token>, expect_close_paren: bool) -> Result<Expr, ParseError> {
     let mut result = parse_one(it)?;
     let mut maybe_op = parse_operator(it, expect_close_paren)?;
     while let Some(op) = maybe_op {
         let rhs = parse_one(it)?;
-        result = SyntaxTree::Op {
+        result = Expr::Op {
             op,
             left: Box::new(result),
             right: Box::new(rhs),
@@ -35,11 +26,11 @@ fn parse_it(it: &mut Iter<Token>, expect_close_paren: bool) -> Result<SyntaxTree
     Ok(result)
 }
 
-fn parse_one(it: &mut Iter<Token>) -> Result<SyntaxTree, ParseError> {
+fn parse_one(it: &mut Iter<Token>) -> Result<Expr, ParseError> {
     let t = it.next().ok_or(ParseError::UnexpectedEnd)?;
     match t {
         Token::OpenParen => parse_it(it, true),
-        Token::Num(x) => Ok(SyntaxTree::Num(*x)),
+        Token::Num(x) => Ok(Expr::Num(*x)),
         x => Err(ParseError::UnexpectedToken(*x)),
     }
 }
@@ -71,10 +62,10 @@ mod tests {
             Token::CloseParen,
         ];
         assert_eq!(
-            Ok(SyntaxTree::Op {
+            Ok(Expr::Op {
                 op: Operator::Add,
-                left: Box::new(SyntaxTree::Num(5)),
-                right: Box::new(SyntaxTree::Num(2))
+                left: Box::new(Expr::Num(5)),
+                right: Box::new(Expr::Num(2))
             }),
             parse(&input[..])
         );

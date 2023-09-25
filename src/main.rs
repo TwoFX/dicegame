@@ -1,4 +1,4 @@
-use dicegame::expr;
+use dicegame::expr::Expr;
 use std::io;
 
 fn main() {
@@ -8,6 +8,6 @@ fn main() {
         .read_line(&mut input)
         .expect("Failed to read line");
 
-    let parsed = expr::parse(input.as_str());
+    let parsed = Expr::parse(input.as_str());
     println!("{parsed:?}");
 }

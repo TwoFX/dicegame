@@ -16,7 +16,7 @@ fn main() {
     let parsed = match Expr::parse(input.as_str()) {
         Ok(p) => p,
         Err(e) => {
-            println!("Failed to parse: {e:?}");
+            println!("Failed to parse: {e}");
             return;
         }
     };
@@ -31,7 +31,7 @@ fn main() {
     let pe = match parsed.eval() {
         Ok(p) => p,
         Err(e) => {
-            println!("Failed to evaluate: {e:?}");
+            println!("Failed to evaluate: {e}");
             return;
         }
     };

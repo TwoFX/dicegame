@@ -9,6 +9,17 @@ pub enum Token {
     Op(Operator),
 }
 
+impl std::fmt::Display for Token {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Token::Num(x) => write!(f, "Number {}", x),
+            Token::OpenParen => write!(f, "Open paren"),
+            Token::CloseParen => write!(f, "Close paren"),
+            Token::Op(op) => write!(f, "Operator {}", op),
+        }
+    }
+}
+
 use std::{iter::Peekable, str::Chars};
 
 use Operator::*;

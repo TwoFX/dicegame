@@ -67,7 +67,7 @@ mod tests {
                 left: Box::new(Expr::Num(5)),
                 right: Box::new(Expr::Num(2))
             }),
-            parse(&input[..])
+            parse(input.as_slice())
         );
     }
 
@@ -76,13 +76,13 @@ mod tests {
         let input = vec![Token::Num(3), Token::CloseParen];
         assert_eq!(
             Err(ParseError::UnexpectedToken(Token::CloseParen)),
-            parse(&input[..])
+            parse(input.as_slice())
         );
     }
 
     #[test]
     fn unmatched_open_paren() {
         let input = vec![Token::OpenParen, Token::Num(3)];
-        assert_eq!(Err(ParseError::UnexpectedEnd), parse(&input[..]));
+        assert_eq!(Err(ParseError::UnexpectedEnd), parse(input.as_slice()));
     }
 }

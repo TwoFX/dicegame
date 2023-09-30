@@ -11,6 +11,17 @@ pub enum Operator {
     Div,
 }
 
+impl std::fmt::Display for Operator {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Operator::Add => write!(f, "Addition"),
+            Operator::Sub => write!(f, "Subtraction"),
+            Operator::Mul => write!(f, "Multiplication"),
+            Operator::Div => write!(f, "Division"),
+        }
+    }
+}
+
 #[derive(PartialEq, Eq, Debug)]
 pub enum Expr {
     Num(u32),
@@ -21,25 +32,16 @@ pub enum Expr {
     },
 }
 
-#[derive(PartialEq, Eq, Debug)]
-pub enum ParseError {
-    UnknownToken(char),
-    NumberTooLarge,
-    UnexpectedToken(lex::Token),
-    UnexpectedEnd,
-}
+mod error;
 
-#[derive(PartialEq, Eq, Debug)]
-pub enum EvalError {
-    DivisionByZero,
-}
+pub use error::{EvalError, ParseError};
 
 mod lex;
 mod parse;
 
 impl Expr {
     pub fn parse(s: &str) -> Result<Expr, ParseError> {
-        parse::parse(&lex::lex(s)?[..])
+        parse::parse(lex::lex(s)?.as_slice())
     }
 
     pub fn histogram(&self) -> HashMap<u32, u32> {

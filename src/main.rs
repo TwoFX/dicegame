@@ -1,12 +1,22 @@
 use dicegame::expr;
 use dicegame::expr::Expr;
 use num_rational::Rational64;
+use rand::{distributions::Uniform, Rng};
 use std::{collections::HashMap, io};
 use thiserror::Error;
 
 fn main() {
-    let v = vec![1, 2, 3, 4];
-    play_round(v.as_slice());
+    for _ in 0..5 {
+        let v = create();
+        play_round(v.as_slice());
+    }
+}
+
+fn create() -> Vec<u32> {
+    rand::thread_rng()
+        .sample_iter(Uniform::new(1, 7))
+        .take(4)
+        .collect()
 }
 
 #[derive(Debug, Error)]

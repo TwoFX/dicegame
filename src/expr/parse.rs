@@ -85,4 +85,50 @@ mod tests {
         let input = vec![Token::OpenParen, Token::Num(3)];
         assert_eq!(Err(ParseError::UnexpectedEnd), parse(input.as_slice()));
     }
+
+    #[test]
+    fn precendence1() {
+        let input = vec![
+            Token::Num(2),
+            Token::Op(Operator::Sub),
+            Token::Num(3),
+            Token::Op(Operator::Mul),
+            Token::Num(5),
+        ];
+        assert_eq!(
+            Ok(Expr::Op {
+                op: Operator::Mul,
+                left: Box::new(Expr::Op {
+                    op: Operator::Sub,
+                    left: Box::new(Expr::Num(2)),
+                    right: Box::new(Expr::Num(3))
+                }),
+                right: Box::new(Expr::Num(5))
+            }),
+            parse(input.as_slice())
+        );
+    }
+
+    #[test]
+    fn precendence2() {
+        let input = vec![
+            Token::Num(2),
+            Token::Op(Operator::Mul),
+            Token::Num(3),
+            Token::Op(Operator::Sub),
+            Token::Num(5),
+        ];
+        assert_eq!(
+            Ok(Expr::Op {
+                op: Operator::Mul,
+                left: Box::new(Expr::Num(2)),
+                right: Box::new(Expr::Op {
+                    op: Operator::Sub,
+                    left: Box::new(Expr::Num(3)),
+                    right: Box::new(Expr::Num(5))
+                })
+            }),
+            parse(input.as_slice())
+        );
+    }
 }

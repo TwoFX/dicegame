@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 num-rational = "0.4"
 thiserror = "1.0"
+rand = "0.8.5"

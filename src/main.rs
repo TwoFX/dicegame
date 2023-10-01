@@ -2,6 +2,8 @@ use clap::Parser;
 use dicegame::expr;
 use dicegame::expr::Expr;
 use num_rational::Rational64;
+use rand::rngs::StdRng;
+use rand::SeedableRng;
 use rand::{distributions::Uniform, Rng};
 use std::time::Instant;
 use std::{collections::HashMap, io};
@@ -14,35 +16,35 @@ struct Args {
     rounds: u32,
 
     #[arg(short, long)]
-    time: bool,
+    seed: Option<u64>,
 }
 
 fn main() {
     let args = Args::parse();
 
+    let mut rng = match &args.seed {
+        Some(seed) => StdRng::seed_from_u64(*seed),
+        None => StdRng::from_entropy(),
+    };
+
     let mut total_incorrect_attempts = 0;
 
     let start = Instant::now();
     for _ in 0..args.rounds {
-        let v = create();
+        let v = create(&mut rng);
         total_incorrect_attempts += play_round(v.as_slice());
     }
 
-    if args.time {
-        println!(
-            "Played {} rounds in {}s, {} incorrect attempts",
-            args.rounds,
-            start.elapsed().as_secs_f64(),
-            total_incorrect_attempts
-        );
-    }
+    println!(
+        "Played {} rounds in {}s, {} incorrect attempts",
+        args.rounds,
+        start.elapsed().as_secs_f64(),
+        total_incorrect_attempts
+    );
 }
 
-fn create() -> Vec<u32> {
-    rand::thread_rng()
-        .sample_iter(Uniform::new(1, 7))
-        .take(4)
-        .collect()
+fn create<T: Rng>(rng: &mut T) -> Vec<u32> {
+    rng.sample_iter(Uniform::new(1, 7)).take(4).collect()
 }
 
 #[derive(Debug, Error)]

@@ -108,7 +108,7 @@ fn process_input(
     let actual_value = expr.eval().map_err(InputError::Eval)?;
     if actual_value != *expected_value {
         return Err(InputError::Value {
-            expected: expected_value.clone(),
+            expected: *expected_value,
             actual: actual_value,
         });
     }

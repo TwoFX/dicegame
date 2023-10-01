@@ -61,7 +61,7 @@ fn lex_chars(mut it: Peekable<Chars>) -> Result<Vec<Token>, ParseError> {
 
 fn parse_number(it: &mut Peekable<Chars>, first_digit: char) -> Result<Token, ParseError> {
     let mut result = first_digit.to_digit(10).unwrap();
-    while it.peek().map(|d| d.is_digit(10)).unwrap_or(false) {
+    while it.peek().map(|d| d.is_ascii_digit()).unwrap_or(false) {
         let next_digit = it.next().unwrap().to_digit(10).unwrap();
         result = add_digit(result, next_digit).ok_or(NumberTooLarge)?;
     }

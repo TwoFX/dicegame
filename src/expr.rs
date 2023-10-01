@@ -59,8 +59,8 @@ impl Expr {
             match e {
                 Expr::Num(x) => *out.entry(*x).or_insert(0) += 1,
                 Expr::Op { op: _, left, right } => {
-                    inner(&left, out);
-                    inner(&right, out);
+                    inner(left, out);
+                    inner(right, out);
                 }
             }
         }

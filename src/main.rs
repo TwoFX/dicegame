@@ -2,11 +2,8 @@ use clap::Parser;
 use dicegame::expr;
 use dicegame::expr::Expr;
 use num_rational::Rational64;
-use rand::rngs::StdRng;
-use rand::SeedableRng;
-use rand::{distributions::Uniform, Rng};
-use std::time::Instant;
-use std::{collections::HashMap, io};
+use rand::{distributions::Uniform, rngs::StdRng, Rng, SeedableRng};
+use std::{collections::HashMap, io, time::Instant};
 use thiserror::Error;
 
 #[derive(Parser, Debug)]

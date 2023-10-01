@@ -11,6 +11,16 @@ pub enum Operator {
     Div,
 }
 
+impl Operator {
+    // Should this be moved to parse.rs?
+    fn precedence(&self) -> u32 {
+        match self {
+            Operator::Add | Operator::Sub => 1,
+            Operator::Mul | Operator::Div => 2,
+        }
+    }
+}
+
 impl std::fmt::Display for Operator {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

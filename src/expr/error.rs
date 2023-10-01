@@ -12,6 +12,8 @@ pub enum ParseError {
     UnexpectedToken(Token),
     #[error("unexpected end of input")]
     UnexpectedEnd,
+    #[error("unexpected structure")]
+    UnexpectedStructure,
 }
 
 #[non_exhaustive]

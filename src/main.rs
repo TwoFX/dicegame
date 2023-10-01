@@ -1,14 +1,40 @@
+use clap::Parser;
 use dicegame::expr;
 use dicegame::expr::Expr;
 use num_rational::Rational64;
 use rand::{distributions::Uniform, Rng};
+use std::time::Instant;
 use std::{collections::HashMap, io};
 use thiserror::Error;
 
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    #[arg(short, long, default_value_t = 5)]
+    rounds: u32,
+
+    #[arg(short, long)]
+    time: bool,
+}
+
 fn main() {
-    for _ in 0..5 {
+    let args = Args::parse();
+
+    let mut total_incorrect_attempts = 0;
+
+    let start = Instant::now();
+    for _ in 0..args.rounds {
         let v = create();
-        play_round(v.as_slice());
+        total_incorrect_attempts += play_round(v.as_slice());
+    }
+
+    if args.time {
+        println!(
+            "Played {} rounds in {}s, {} incorrect attempts",
+            args.rounds,
+            start.elapsed().as_secs_f64(),
+            total_incorrect_attempts
+        );
     }
 }
 
@@ -39,19 +65,22 @@ enum InputError {
     },
 }
 
-fn play_round(v: &[u32]) {
+fn play_round(v: &[u32]) -> u32 {
     println!("{v:?}");
 
     let expected_histogram = histogram(v);
     let expected_value = Rational64::from_integer(1);
 
+    let mut incorrect_attempts = 0;
+
     loop {
         if let Err(e) = process_input(&expected_histogram, &expected_value) {
             println!("Incorrect input: {e}");
+            incorrect_attempts += 1;
             continue;
         } else {
             println!("Correct!");
-            break;
+            return incorrect_attempts;
         }
     }
 }

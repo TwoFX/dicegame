@@ -94,7 +94,7 @@ fn process_input(
         return Err(InputError::Io(e));
     }
 
-    let expr = Expr::parse(input.as_str()).map_err(InputError::Parse)?;
+    let expr = Expr::parse(input.as_str())?;
 
     let actual_histogram = expr.histogram();
     if actual_histogram != *expected_histogram {
@@ -104,7 +104,7 @@ fn process_input(
         });
     }
 
-    let actual_value = expr.eval().map_err(InputError::Eval)?;
+    let actual_value = expr.eval()?;
     if actual_value != *expected_value {
         return Err(InputError::Value {
             expected: *expected_value,
